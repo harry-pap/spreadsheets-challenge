@@ -3,32 +3,35 @@ from parameterized import parameterized
 
 from parser.expression_parser import default_expression_parser
 from parser.expression_parser import validate_parentheses_in_expression
+from decimal import Decimal
 
 
 class ExpressionParserTest(unittest.TestCase):
     @parameterized.expand([
-        ["1*3", 3],
-        ["1+3", 4],
-        ["1+3*5", 16],
-        ["1-10+50-22-15+159-2100", -1937],
-        ["1*3-15+7*12-129*31", -3927],
-        ["15+251-256*3-5125+3*1052+17", -2454],
-        ["1*15+30+3/15*12/3+1351", 1396.8],
-        ["2+50/12*128/150/12*24*40+256-360*222+2154*126/22/10*20*50*2*3*5", 36930258.80808081],
-        ["1+2*(1+5)-4", 9],
-        ["(1+2)*(1+5)-4*(1+9)-3", -25],
-        ["(1+2*(1+3))*(1+5)-4*(1*(3+4-5))-3", 43],
-        ["(1+2)*(3+4*5*(6-4))-(9/3)", 126],
-        ["sqr(sqr(2))", 16],
-        ["sqr(sqr(sqr(2)))", 256],
-        ["sqr(sqr(2))+1*3", 19],
-        ["sqr(sqr(sqr(2)))+1*3", 259],
-        ["1+(sqr(sqr(2)))*(1+5)-4", 93],
-
+        ["1*3", Decimal(3)],
+        ["1+3", Decimal(4)],
+        ["1+3*5", Decimal(16)],
+        ["1-10+50-22-15+159-2100", Decimal(-1937)],
+        ["1*3-15+7*12-129*31", Decimal(-3927)],
+        ["15+251-256*3-5125+3*1052+17", Decimal(-2454)],
+        ["1*15+30+3/15*12/3+1351", Decimal('1396.8')],
+        ["2+50/12*128/150/12*24*40+256-360*222+2154*126/22/10*20*50*2*3*5", Decimal('36930258.80808080808080808079')],
+        ["1+2*(1+5)-4", Decimal(9)],
+        ["(1+2)*(1+5)-4*(1+9)-3", Decimal(-25)],
+        ["(1+2*(1+3))*(1+5)-4*(1*(3+4-5))-3", Decimal(43)],
+        ["(1+2)*(3+4*5*(6-4))-(9/3)", Decimal(126)],
+        ["sqr(sqr(2))", Decimal(16)],
+        ["sqr(sqr(sqr(2)))", Decimal(256)],
+        ["sqr(sqr(2))+1*3", Decimal(19)],
+        ["sqr(sqr(sqr(2)))+1*3", Decimal(259)],
+        ["1+(sqr(sqr(2)))*(1+5)-4", Decimal(93)],
+        ["uppercase(\"abc\")", "ABC"],
+        ["uppercase(text(sqr(2)))", "4"],
     ])
     def test_numeric_operations(self, expression, expected):
         parser = default_expression_parser()
-        self.assertEqual(expected, parser.parse(expression).visit())
+        actual = parser.parse(expression).visit()
+        self.assertEqual(expected, actual)
 
     @parameterized.expand([
         ["*3", 'Operator scanned without an operand first'],

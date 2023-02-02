@@ -2,8 +2,9 @@ import re
 
 from parser.node import Node
 from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
-from parser.raw_matcher import RawNumberMatcher
-from parser.funtion import SquareFunction
+from parser.raw_matcher import RawNumberMatcher, RawStringMatcher
+from parser.funtion import SquareFunction, UppercaseFunction, TextFunction
+
 
 class MainLoopContinue(Exception):
     pass
@@ -107,6 +108,8 @@ class ExpressionParser:
                     i += 1
                     scanned_subtree = None
                     raise MainLoopContinue
+
+                raise Exception("Could not match input at: {}".format(expression[i:]))
             except MainLoopContinue:
                 pass
 
@@ -128,9 +131,12 @@ def default_expression_parser():
         ],
         [
             SquareFunction(),
+            UppercaseFunction(),
+            TextFunction(),
         ],
         [
             RawNumberMatcher(),
+            RawStringMatcher(),
         ]
     )
 

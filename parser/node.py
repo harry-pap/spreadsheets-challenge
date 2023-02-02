@@ -1,5 +1,7 @@
 from parser.numeric_operation import Operation
 from parser.funtion import Function
+from decimal import Decimal
+
 
 class Node:
     def __init__(self, value, left, right):
@@ -13,7 +15,7 @@ class Node:
             ret += child.__str__(level + 1)
         return ret
 
-    def visit(self, sum=0):
+    def visit(self, sum=Decimal(0)):
         from_left = None if self.left is None else self.left.visit(sum)
         from_right = None if self.right is None else self.right.visit(sum)
 
