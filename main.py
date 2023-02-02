@@ -1,24 +1,12 @@
-from parser.node import Node
-from parser.expression_parser import ExpressionParser
-from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
-from parser.raw_matcher import RawNumberMatcher
 import parser.numeric_operation as num
+from parser.expression_parser import default_expression_parser
+from parser.node import Node
 
 
 def main():
-    expression = "10+20*300+4000"
+    expression = "sqr(sqr(2))+1*3"
 
-    parser = ExpressionParser(
-        [
-            Addition(),
-            Subtraction(),
-            Multiplication(),
-            Division(),
-        ],
-        [
-            RawNumberMatcher()
-        ]
-    )
+    parser = default_expression_parser()
 
     result = parser.parse(expression)
     print("Tree:\n{}".format(result))

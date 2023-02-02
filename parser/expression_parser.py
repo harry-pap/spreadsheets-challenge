@@ -3,16 +3,17 @@ import re
 from parser.node import Node
 from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
 from parser.raw_matcher import RawNumberMatcher
-
+from parser.funtion import SquareFunction
 
 class MainLoopContinue(Exception):
     pass
 
 
 class ExpressionParser:
-    def __init__(self, validate_parentheses, arithmetic_operators, raw_matchers):
+    def __init__(self, validate_parentheses, arithmetic_operators, functions, raw_matchers):
         self.validate_parentheses = validate_parentheses
         self.arithmetic_operators = arithmetic_operators
+        self.functions = functions
         self.raw_matchers = raw_matchers
 
     def parse(self, expression):
@@ -34,6 +35,24 @@ class ExpressionParser:
                     subexpression = expression[i + 1: i + 1 + closing_index]
                     scanned_subtree = self.parse(subexpression)
                     i += closing_index + 2
+                    raise MainLoopContinue
+
+                for function in self.functions:
+                    if not expression[i:].startswith(function.symbol):
+                        continue
+
+                    function_end_index = i + len(function.symbol) + 1
+                    closing_parentheses_index = index_of_closing_parentheses(expression[function_end_index:])
+                    subexpression = expression[function_end_index: function_end_index + closing_parentheses_index]
+
+                    subtree = self.parse(subexpression)
+
+                    scanned_subtree = Node(
+                        function,
+                        subtree,
+                        None
+                    )
+                    i = function_end_index + closing_parentheses_index + 1
                     raise MainLoopContinue
 
                 for matcher in self.raw_matchers:
@@ -91,6 +110,9 @@ class ExpressionParser:
             except MainLoopContinue:
                 pass
 
+        if root is None:
+            return scanned_subtree
+
         last_added_node.right = scanned_subtree
         return root
 
@@ -105,7 +127,10 @@ def default_expression_parser():
             Division(),
         ],
         [
-            RawNumberMatcher()
+            SquareFunction(),
+        ],
+        [
+            RawNumberMatcher(),
         ]
     )
 

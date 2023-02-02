@@ -1,5 +1,5 @@
 from parser.numeric_operation import Operation
-
+from parser.funtion import Function
 
 class Node:
     def __init__(self, value, left, right):
@@ -19,5 +19,7 @@ class Node:
 
         if isinstance(self.value, Operation):
             return self.value(from_left, from_right)
+        elif isinstance(self.value, Function):
+            return self.value(from_left)
         else:
             return self.value

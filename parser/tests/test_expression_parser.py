@@ -18,7 +18,13 @@ class ExpressionParserTest(unittest.TestCase):
         ["1+2*(1+5)-4", 9],
         ["(1+2)*(1+5)-4*(1+9)-3", -25],
         ["(1+2*(1+3))*(1+5)-4*(1*(3+4-5))-3", 43],
-        ["(1+2)*(3+4*5*(6-4))-(9/3)", 126]
+        ["(1+2)*(3+4*5*(6-4))-(9/3)", 126],
+        ["sqr(sqr(2))", 16],
+        ["sqr(sqr(sqr(2)))", 256],
+        ["sqr(sqr(2))+1*3", 19],
+        ["sqr(sqr(sqr(2)))+1*3", 259],
+        ["1+(sqr(sqr(2)))*(1+5)-4", 93],
+
     ])
     def test_numeric_operations(self, expression, expected):
         parser = default_expression_parser()
