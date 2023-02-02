@@ -26,6 +26,7 @@ class ExpressionParserTest(unittest.TestCase):
 
     @parameterized.expand([
         ["*3", 'Operator scanned without an operand first'],
+        ["2(3)", "Scanned subexpression after value or expression without an operator in between"]
     ])
     def test_raises_exception_for_invalid_input(self, expression, expected):
         parser = default_expression_parser()

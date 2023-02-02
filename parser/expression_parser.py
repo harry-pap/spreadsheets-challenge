@@ -27,6 +27,9 @@ class ExpressionParser:
         while i < len(expression):
             try:
                 if expression[i] == "(":
+                    if scanned_subtree is not None:
+                        raise Exception("Scanned subexpression after value or expression without an operator in between")
+
                     closing_index = index_of_closing_parentheses(expression[i + 1:])
                     subexpression = expression[i + 1: i + 1 + closing_index]
                     scanned_subtree = self.parse(subexpression)
