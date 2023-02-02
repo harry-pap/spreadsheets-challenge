@@ -4,7 +4,7 @@ from parser.node import Node
 
 
 def main():
-    expression = "sqr(sqr(2))+1*3"
+    expression = "\"abc\"+3"
 
     parser = default_expression_parser()
 

@@ -1,5 +1,13 @@
+from decimal import Decimal
+
+
 class Operation:
-    pass
+    def verify(self, left, right):
+        if not isinstance(left, Decimal):
+            raise Exception("Left operand of numeric operation is not a number but {}".format(type(left).__name__))
+
+        if not isinstance(right, Decimal):
+            raise Exception("Right operand of numeric operation is not a number but {}".format(type(right).__name__))
 
 
 class Addition(Operation):
@@ -7,6 +15,7 @@ class Addition(Operation):
         return "Addition"
 
     def __call__(self, left, right):
+        self.verify(left, right)
         return left + right
 
     symbol = "+"
@@ -19,6 +28,7 @@ class Subtraction(Operation):
         return "Subtraction"
 
     def __call__(self, left, right):
+        self.verify(left, right)
         return left - right
 
     symbol = "-"
@@ -31,6 +41,7 @@ class Multiplication(Operation):
         return "Multiplication"
 
     def __call__(self, left, right):
+        self.verify(left, right)
         return left * right
 
     symbol = "*"
@@ -43,6 +54,7 @@ class Division(Operation):
         return "Division"
 
     def __call__(self, left, right):
+        self.verify(left, right)
         return left / right
 
     symbol = "/"
