@@ -10,11 +10,14 @@ class MainLoopContinue(Exception):
 
 
 class ExpressionParser:
-    def __init__(self, arithmetic_operators, raw_matchers):
+    def __init__(self, validate_parentheses, arithmetic_operators, raw_matchers):
+        self.validate_parentheses = validate_parentheses
         self.arithmetic_operators = arithmetic_operators
         self.raw_matchers = raw_matchers
 
     def parse(self, expression):
+        self.validate_parentheses(expression)
+
         root = None
         last_added_node = None
         scanned_subtree = None
@@ -23,6 +26,13 @@ class ExpressionParser:
 
         while i < len(expression):
             try:
+                if expression[i] == "(":
+                    closing_index = index_of_closing_parentheses(expression[i + 1:])
+                    subexpression = expression[i + 1: i + 1 + closing_index]
+                    scanned_subtree = self.parse(subexpression)
+                    i += closing_index + 2
+                    raise MainLoopContinue
+
                 for matcher in self.raw_matchers:
                     match = re.match(matcher.regex, expression[i:])
                     if match is not None:
@@ -72,9 +82,9 @@ class ExpressionParser:
                         root = Node(operator, root, None)
                         last_added_node = root
 
-                i += 1
-                scanned_subtree = None
-                raise MainLoopContinue
+                    i += 1
+                    scanned_subtree = None
+                    raise MainLoopContinue
             except MainLoopContinue:
                 pass
 
@@ -84,6 +94,7 @@ class ExpressionParser:
 
 def default_expression_parser():
     return ExpressionParser(
+        validate_parentheses_in_expression,
         [
             Addition(),
             Subtraction(),
@@ -94,3 +105,36 @@ def default_expression_parser():
             RawNumberMatcher()
         ]
     )
+
+
+def index_of_closing_parentheses(expression):
+    level = 1
+    i = 0
+
+    for current in expression:
+        if current == '(':
+            level += 1
+        elif current == ')':
+            level -= 1
+
+        if level == 0:
+            return i
+        i += 1
+
+
+def validate_parentheses_in_expression(expression):
+    counter = 0
+
+    for i in expression:
+        if i == '(':
+            counter += 1
+        elif i == ')':
+            counter -= 1
+
+        if counter < 0:
+            raise Exception("Illegal syntax, ')' found without a matching '('")
+
+    if counter != 0:
+        raise Exception("Illegal syntax, '(' found without a matching ')'")
+
+
