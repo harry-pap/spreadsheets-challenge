@@ -1,9 +1,10 @@
 import re
 
-from parser.node import Node
+from parser.node import Node, Link
 from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
 from parser.raw_matcher import RawNumberMatcher, RawStringMatcher
-from parser.funtion import SquareFunction, UppercaseFunction, TextFunction
+from parser.funtion import SquareFunction, SumFunction, UppercaseFunction, TextFunction, BiggerThanOrEqualToFunction, \
+    ConcatFunction, SplitFunction, SpreadFunction
 
 
 class MainLoopContinue(Exception):
@@ -28,13 +29,18 @@ class ExpressionParser:
 
         while i < len(expression):
             try:
+                if expression[i] == " ":
+                    i += 1
+                    raise MainLoopContinue
+
                 if expression[i] == "(":
                     if scanned_subtree is not None:
                         raise Exception("Scanned subexpression after value or expression without an operator in between")
 
-                    closing_index = index_of_closing_parentheses(expression[i + 1:])
+                    closing_index = self.__index_of_closing_parentheses(expression[i + 1:])
                     subexpression = expression[i + 1: i + 1 + closing_index]
-                    scanned_subtree = self.parse(subexpression)
+                    node = self.parse(subexpression)
+                    scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
                     i += closing_index + 2
                     raise MainLoopContinue
 
@@ -43,32 +49,48 @@ class ExpressionParser:
                         continue
 
                     function_end_index = i + len(function.symbol) + 1
-                    closing_parentheses_index = index_of_closing_parentheses(expression[function_end_index:])
+                    closing_parentheses_index = self.__index_of_closing_parentheses(expression[function_end_index:])
                     subexpression = expression[function_end_index: function_end_index + closing_parentheses_index]
 
                     subtree = self.parse(subexpression)
 
-                    scanned_subtree = Node(
+                    node = Node(
                         function,
                         subtree,
                         None
                     )
+
+                    scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
+
                     i = function_end_index + closing_parentheses_index + 1
                     raise MainLoopContinue
 
                 for matcher in self.raw_matchers:
                     match = re.match(matcher.regex, expression[i:])
                     if match is not None:
-                        if scanned_subtree is not None:
+                        if scanned_subtree is not None and not isinstance(scanned_subtree.value, Link):
                             raise Exception("Scanned consecutive values without an operator")
 
-                        scanned_subtree = Node(
+                        node = Node(
                             matcher.value(expression[i:i+(match.end())]),
                             None,
                             None
                         )
+                        scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
                         i += match.end()
                         raise MainLoopContinue
+
+                if expression[i] == ',':
+                    if scanned_subtree is None:
+                        raise Exception("',' can only be used to concatenate arguments")
+
+                    scanned_subtree = Node(
+                        Link(),
+                        scanned_subtree,
+                        None
+                    )
+                    i += 1
+                    raise MainLoopContinue
 
                 for operator in self.arithmetic_operators:
                     if operator.symbol != expression[i]:
@@ -119,6 +141,33 @@ class ExpressionParser:
         last_added_node.right = scanned_subtree
         return root
 
+    @staticmethod
+    def __index_of_closing_parentheses(expression):
+        level = 1
+        i = 0
+
+        for current in expression:
+            if current == '(':
+                level += 1
+            elif current == ')':
+                level -= 1
+
+            if level == 0:
+                return i
+            i += 1
+
+    @staticmethod
+    def __handle_scanned_subtree(existing_subtree, scanned_node):
+        if existing_subtree is not None and isinstance(existing_subtree.value, Link):
+            existing_subtree.right = scanned_node
+            return Node(
+                Link(),
+                existing_subtree,
+                None
+            )
+
+        return scanned_node
+
 
 def default_expression_parser():
     return ExpressionParser(
@@ -131,7 +180,12 @@ def default_expression_parser():
         ],
         [
             SquareFunction(),
+            SumFunction(),
+            SpreadFunction(),
+            SplitFunction(),
             UppercaseFunction(),
+            ConcatFunction(),
+            BiggerThanOrEqualToFunction(),
             TextFunction(),
         ],
         [
@@ -139,21 +193,6 @@ def default_expression_parser():
             RawStringMatcher(),
         ]
     )
-
-
-def index_of_closing_parentheses(expression):
-    level = 1
-    i = 0
-
-    for current in expression:
-        if current == '(':
-            level += 1
-        elif current == ')':
-            level -= 1
-
-        if level == 0:
-            return i
-        i += 1
 
 
 def validate_parentheses_in_expression(expression):
@@ -170,5 +209,4 @@ def validate_parentheses_in_expression(expression):
 
     if counter != 0:
         raise Exception("Illegal syntax, '(' found without a matching ')'")
-
 

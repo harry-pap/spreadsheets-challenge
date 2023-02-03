@@ -3,6 +3,10 @@ from parser.funtion import Function
 from decimal import Decimal
 
 
+class Link:
+    pass
+
+
 class Node:
     def __init__(self, value, left, right):
         self.value = value
@@ -23,5 +27,21 @@ class Node:
             return self.value(from_left, from_right)
         elif isinstance(self.value, Function):
             return self.value(from_left)
+        elif isinstance(self.value, Link):
+            list_from_left = self.__list_from_link(from_left)
+            list_from_right = self.__list_from_link(from_right)
+
+            return list(filter(None, list_from_left + list_from_right))
         else:
             return self.value
+
+    @staticmethod
+    def __list_from_link(result_from_subtree):
+        if result_from_subtree is None:
+            list_from_left = []
+        elif isinstance(result_from_subtree, list):
+            list_from_left = result_from_subtree
+        else:
+            list_from_left = [result_from_subtree]
+
+        return list_from_left

@@ -27,10 +27,19 @@ class ExpressionParserTest(unittest.TestCase):
         ["1+(sqr(sqr(2)))*(1+5)-4", Decimal(93)],
         ["uppercase(\"abc\")", "ABC"],
         ["uppercase(text(sqr(2)))", "4"],
+        ["sum(1,2,3,4)", Decimal(10)],
+        ["sum(1,2,sqr(sqr(2)),4)", Decimal(23)],
+        ["sum(sum(1,sqr(2),3),2,sqr(sqr(2)),4)", Decimal(30)],
+        ["bte(12,10)", True],
+        ["bte(sqr(2),4)", True],
+        ["bte(sqr(2),4.2)", False],
+        ["concat(\"abc\",\"def\",text(123),uppercase(\"bar\"))", "abcdef123BAR"],
+        ["3+sum(spread(split(\"123,456\",\",\")))", Decimal(582)]
     ])
     def test_numeric_operations(self, expression, expected):
         parser = default_expression_parser()
-        actual = parser.parse(expression).visit()
+        node = parser.parse(expression)
+        actual = node.visit()
         self.assertEqual(expected, actual)
 
     @parameterized.expand([
