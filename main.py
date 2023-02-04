@@ -1,16 +1,13 @@
 import parser.numeric_operation as num
-from parser.expression_parser import default_expression_parser
+from parser.csvparser import CSVParser
 from parser.node import Node
+from parser.expression_parser import default_expression_parser
+from parser.cell_processor import CellProcessor
 
 
 def main():
-    expression = "\"abc\"+3"
-
-    parser = default_expression_parser()
-
-    result = parser.parse(expression)
-    print("Tree:\n{}".format(result))
-    print("Result:{}".format(result.visit()))
+    parser = CSVParser(CellProcessor(default_expression_parser()))
+    parser.parse_file("/tmp/parser/test.csv", "/tmp/parser/output.csv")
 
 
 def create_operetion_node():

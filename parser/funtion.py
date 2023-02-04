@@ -11,7 +11,7 @@ class SquareFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, Decimal):
-            raise "SquareFunction requires number as input, instead got '{}'".format(arg)
+            raise Exception("SquareFunction requires number as input, instead got '{}'".format(arg))
 
         return arg * arg
 
@@ -24,11 +24,11 @@ class SumFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, list):
-            raise "SumFunction requires list of numbers as input, instead got '{}'".format(arg)
+            raise Exception("SumFunction requires list of numbers as input, instead got '{}'".format(arg))
 
         for item in arg:
             if not isinstance(item, Decimal):
-                raise "SumFunction requires list of numbers as input, instead got '{}' as part of the argument list".format(arg)
+                raise Exception("SumFunction requires list of numbers as input, instead got '{}'".format(arg))
 
         return sum(arg)
 
@@ -41,14 +41,15 @@ class BiggerThanOrEqualToFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, list):
-            raise "BTE function requires 2 arguments to be provided as list, instead got '{}'".format(arg)
+            raise Exception("BTE function requires 2 arguments to be provided as list, instead got '{}'".format(arg))
 
         if len(arg) != 2:
-            raise "BTE function requires exactly 2 arguments to be provided as list, instead got '{}'".format(arg)
+            raise Exception("BTE function requires exactly 2 arguments to be provided as list, instead got '{}'"
+                            .format(arg))
 
         for item in arg:
             if not isinstance(item, Decimal):
-                raise "BTE function requires numbers as arguments".format(arg)
+                raise Exception("BTE function requires numbers as arguments, instead got '{}'".format(arg))
 
         return arg[0] >= arg[1]
 
@@ -61,7 +62,7 @@ class UppercaseFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, str):
-            raise "uppercase requires text as input, instead got '{}'".format(arg)
+            raise Exception("uppercase requires text as input, instead got '{}'".format(arg))
 
         return arg.upper()
 
@@ -74,14 +75,15 @@ class SplitFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, list):
-            raise "split function requires list of text as input, instead got '{}'".format(arg)
+            raise Exception("split function requires list of text as input, instead got '{}'".format(arg))
 
         if len(arg) != 2:
-            raise "split function requires exactly 2 arguments of text type to be provided in a list, instead got '{}'".format(arg)
+            raise Exception("split function requires exactly 2 arguments of text type to be provided in a list,"
+                            " instead got '{}'".format(arg))
 
         for item in arg:
             if not isinstance(item, str):
-                raise "split function requires text as arguments".format(arg)
+                raise Exception("split function requires text as arguments".format(arg))
 
         return [Decimal(it) for it in arg[0].split(arg[1])]
 
@@ -98,7 +100,7 @@ class SpreadFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, list):
-            raise "spread requires list of text as input, instead got '{}'".format(arg)
+            raise Exception("spread function requires list of text as input, instead got '{}'".format(arg))
 
         return arg
 
@@ -111,11 +113,11 @@ class ConcatFunction(Function):
 
     def __call__(self, arg):
         if not isinstance(arg, list):
-            raise "cancat requires list of text as input, instead got '{}'".format(arg)
+            raise Exception("cancat function requires list of text as input, instead got '{}'".format(arg))
 
         for item in arg:
             if not isinstance(item, str):
-                raise "Concat function requires sequence of text as argument".format(arg)
+                raise Exception("concat function requires sequence of text as argument, instead got '{}'".format(arg))
 
         return "".join(arg)
 

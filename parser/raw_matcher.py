@@ -9,7 +9,7 @@ class RawNumberMatcher:
 
 
 class RawStringMatcher:
-    regex = "^\"[a-zA-Z0-9,_]+\""
+    regex = "^\"[a-zA-Z0-9\.,_]+\""
 
     def value(self, str):
         return str[1:][:-1]

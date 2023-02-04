@@ -34,7 +34,8 @@ class ExpressionParserTest(unittest.TestCase):
         ["bte(sqr(2),4)", True],
         ["bte(sqr(2),4.2)", False],
         ["concat(\"abc\",\"def\",text(123),uppercase(\"bar\"))", "abcdef123BAR"],
-        ["3+sum(spread(split(\"123,456\",\",\")))", Decimal(582)]
+        ["3+sum(spread(split(\"123,456\",\",\")))", Decimal(582)],
+        ["text(bte(12,10))", "True"],
     ])
     def test_numeric_operations(self, expression, expected):
         parser = default_expression_parser()
@@ -47,6 +48,22 @@ class ExpressionParserTest(unittest.TestCase):
         ["2(3)", "Scanned subexpression after value or expression without an operator in between"],
         ["\"abc\"+3", "Left operand of numeric operation is not a number but str"],
         ["3+\"abc\"", "Right operand of numeric operation is not a number but str"],
+        ["sqr(\"abc\")", "SquareFunction requires number as input, instead got 'abc'"],
+        ["sum(\"abc\")", "SumFunction requires list of numbers as input, instead got 'abc'"],
+        ["sum(1,\"abc\")", "SumFunction requires list of numbers as input, instead got '[Decimal('1'), 'abc']'"],
+        ["bte(2)", "BTE function requires 2 arguments to be provided as list, instead got '2'"],
+        ["bte(1,2,3)", "BTE function requires exactly 2 arguments to be provided as list,"
+                       " instead got '[Decimal('1'), Decimal('2'), Decimal('3')]'"],
+        ["bte(1,\"abc\")", "BTE function requires numbers as arguments, instead got '[Decimal('1'), 'abc']'"],
+        ["uppercase(32)", "uppercase requires text as input, instead got '32'"],
+        ["split(35)", "split function requires list of text as input, instead got '35'"],
+        ["split(\"foobar\", 22)", "split function requires text as arguments"],
+        ["split(\"foo\", \"bar\",\",\")", "split function requires exactly 2 arguments of text type to be provided in a"
+                                          " list, instead got '['foo', 'bar', ',']'"],
+        ["spread(22)", "spread function requires list of text as input, instead got '22'"],
+        ["concat(\"abc\")", "cancat function requires list of text as input, instead got 'abc'"],
+        ["concat(\"abc\", 22)", "concat function requires sequence of text as argument,"
+                                " instead got '['abc', Decimal('22')]'"],
     ])
     def test_raises_exception_for_invalid_input(self, expression, expected):
         parser = default_expression_parser()
