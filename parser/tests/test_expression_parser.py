@@ -3,6 +3,8 @@ from parameterized import parameterized
 
 from parser.expression_parser import default_expression_parser
 from parser.expression_parser import validate_parentheses_in_expression
+from parser.cell_processor import CellStorage
+from parser.cell import Cell
 from decimal import Decimal
 
 
@@ -37,10 +39,38 @@ class ExpressionParserTest(unittest.TestCase):
         ["3+sum(spread(split(\"123,456\",\",\")))", Decimal(582)],
         ["text(bte(12,10))", "True"],
     ])
-    def test_numeric_operations(self, expression, expected):
+    def test_standalone_expressions(self, expression, expected):
         parser = default_expression_parser()
-        node = parser.parse(expression)
+        node = parser.parse(expression, Cell.from_string("A1"), CellStorage())
         actual = node.visit()
+        self.assertEqual(expected, actual)
+
+    def test_expressions_with_static_cross_references(self):
+        expression = "30+A3*C5"
+        cellstorage = CellStorage()
+        cellstorage.cells[Cell.from_string("A3")] = Decimal(100)
+        cellstorage.cells[Cell.from_string("C5")] = Decimal(300)
+        parser = default_expression_parser()
+
+        node = parser.parse(expression, Cell.from_string("A1"), cellstorage)
+
+        actual = node.visit()
+        expected = Decimal(30030)
+
+        self.assertEqual(expected, actual)
+
+    def test_expressions_with_relative_cross_references(self):
+        expression = "15+B^*C^v"
+        cellstorage = CellStorage()
+        cellstorage.last_added[Cell.int_identifier_from_column_name("C")] = Decimal(1000)
+        cellstorage.cells[Cell.from_string("B1")] = Decimal(3)
+        parser = default_expression_parser()
+
+        node = parser.parse(expression, Cell.from_string("B2"), cellstorage)
+
+        actual = node.visit()
+        expected = Decimal(3015)
+
         self.assertEqual(expected, actual)
 
     @parameterized.expand([
@@ -68,7 +98,7 @@ class ExpressionParserTest(unittest.TestCase):
     def test_raises_exception_for_invalid_input(self, expression, expected):
         parser = default_expression_parser()
         with self.assertRaises(Exception) as context:
-            parser.parse(expression).visit()
+            parser.parse(expression, Cell.from_string("A1"), CellStorage()).visit()
 
         self.assertEqual(expected, str(context.exception), "expression:{}".format(expression))
 

@@ -1,8 +1,10 @@
 import parser.numeric_operation as num
+import re
 from parser.csvparser import CSVParser
 from parser.node import Node
 from parser.expression_parser import default_expression_parser
 from parser.cell_processor import CellProcessor
+from parser.value_referrence import SpecificCellMatcher
 
 
 def main():
@@ -37,4 +39,9 @@ def print_sample_tree():
 
 
 if __name__ == '__main__':
-    main()
+    expression = "A12+35"
+    matcher = SpecificCellMatcher()
+    result = re.match(matcher.regex, expression)
+    cell_identifier = expression[0:0+(result.end())]
+
+    print(result)

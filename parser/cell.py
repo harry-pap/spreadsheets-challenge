@@ -37,6 +37,12 @@ class Cell:
 
         return Cell(column, row)
 
+    @staticmethod
+    def int_identifier_from_column_name(string):
+        if not string[0].isalpha() or not string[0].isupper():
+            raise Exception("Column should be an uppercase letter between {A...Z}")
+
+        return ord(string[0]) - Cell.INDEX_OF_A_CAPITAL + 1
 
 if __name__ == '__main__':
     cell = Cell.from_string("C33")

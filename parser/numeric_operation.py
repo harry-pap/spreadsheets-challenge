@@ -2,6 +2,7 @@ from decimal import Decimal
 
 
 class Operation:
+    # TODO implement implicit casts from string to decimal when needed
     def verify(self, left, right):
         if not isinstance(left, Decimal):
             raise Exception("Left operand of numeric operation is not a number but {}".format(type(left).__name__))

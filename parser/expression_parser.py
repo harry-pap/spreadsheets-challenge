@@ -2,9 +2,12 @@ import re
 
 from parser.node import Node, Link
 from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
-from parser.raw_matcher import RawNumberMatcher, RawStringMatcher
+from parser.raw_value_matcher import RawNumberMatcher, RawStringMatcher
 from parser.funtion import SquareFunction, SumFunction, UppercaseFunction, TextFunction, BiggerThanOrEqualToFunction, \
     ConcatFunction, SplitFunction, SpreadFunction
+from parser.value_referrence import SpecificCellMatcher, LastComputedInColumnMatcher, LastCellInColumnMatcher
+from parser.cell_processor import CellStorage
+from parser.cell import Cell
 
 
 class MainLoopContinue(Exception):
@@ -12,13 +15,14 @@ class MainLoopContinue(Exception):
 
 
 class ExpressionParser:
-    def __init__(self, validate_parentheses, arithmetic_operators, functions, raw_matchers):
+    def __init__(self, validate_parentheses, arithmetic_operators, functions, raw_matchers, reference_matchers):
         self.validate_parentheses = validate_parentheses
         self.arithmetic_operators = arithmetic_operators
         self.functions = functions
         self.raw_matchers = raw_matchers
+        self.reference_matchers = reference_matchers
 
-    def parse(self, expression):
+    def parse(self, expression: str, current_cell: Cell, cell_storage: CellStorage):
         self.validate_parentheses(expression)
 
         root = None
@@ -39,7 +43,7 @@ class ExpressionParser:
 
                     closing_index = self.__index_of_closing_parentheses(expression[i + 1:])
                     subexpression = expression[i + 1: i + 1 + closing_index]
-                    node = self.parse(subexpression)
+                    node = self.parse(subexpression, current_cell, cell_storage)
                     scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
                     i += closing_index + 2
                     raise MainLoopContinue
@@ -52,7 +56,7 @@ class ExpressionParser:
                     closing_parentheses_index = self.__index_of_closing_parentheses(expression[function_end_index:])
                     subexpression = expression[function_end_index: function_end_index + closing_parentheses_index]
 
-                    subtree = self.parse(subexpression)
+                    subtree = self.parse(subexpression, current_cell, cell_storage)
 
                     node = Node(
                         function,
@@ -90,6 +94,23 @@ class ExpressionParser:
                         None
                     )
                     i += 1
+                    raise MainLoopContinue
+
+                for reference in self.reference_matchers:
+                    match = re.match(reference.regex, expression[i:])
+                    if match is None:
+                        continue
+
+                    referenced_value = reference.match(expression[i:], current_cell, cell_storage)
+
+                    node = Node(
+                        referenced_value,
+                        None,
+                        None
+                    )
+                    scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
+
+                    i += match.end()
                     raise MainLoopContinue
 
                 for operator in self.arithmetic_operators:
@@ -191,7 +212,12 @@ def default_expression_parser():
         [
             RawNumberMatcher(),
             RawStringMatcher(),
-        ]
+        ],
+        [
+            SpecificCellMatcher(),
+            LastComputedInColumnMatcher(),
+            LastCellInColumnMatcher(),
+        ],
     )
 
 

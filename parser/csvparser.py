@@ -32,7 +32,7 @@ class CSVParser:
             column_counter = 0
             for item in line:
                 column_counter += 1
-                if item is None:
+                if item == "":
                     row.append(None)
                     continue
                 cell = Cell(column_counter, row_counter)
