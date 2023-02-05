@@ -47,9 +47,15 @@ class BiggerThanOrEqualToFunction(Function):
             raise Exception("BTE function requires exactly 2 arguments to be provided as list, instead got '{}'"
                             .format(arg))
 
-        for item in arg:
+        for index, item in enumerate(arg):
             if not isinstance(item, Decimal):
-                raise Exception("BTE function requires numbers as arguments, instead got '{}'".format(arg))
+                if isinstance(item, str):
+                    try:
+                        arg[index] = Decimal(item)
+                    except Exception:
+                        raise Exception("BTE function requires numbers as arguments, instead got '{}'".format(arg))
+                else:
+                    raise Exception("BTE function requires numbers as arguments, instead got '{}'".format(arg))
 
         return arg[0] >= arg[1]
 
@@ -135,6 +141,19 @@ class TextFunction(Function):
         return str(arg)
 
     symbol = "text"
+
+
+class IncrementFromFunction(Function):
+    def __str__(self):
+        return "IncrementFrom"
+
+    def __call__(self, arg):
+        if not isinstance(arg, Decimal):
+            raise Exception("Argument to incFrom function should be a number")
+
+        return arg
+
+    symbol = "incFrom"
 
 
 def remove_exponent(d):

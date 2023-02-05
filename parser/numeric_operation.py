@@ -5,10 +5,27 @@ class Operation:
     # TODO implement implicit casts from string to decimal when needed
     def verify(self, left, right):
         if not isinstance(left, Decimal):
-            raise Exception("Left operand of numeric operation is not a number but {}".format(type(left).__name__))
+            if isinstance(left, str):
+                try:
+                    left = Decimal(left)
+                except Exception:
+                    raise Exception("Left operand of numeric operation is not a number but {}"
+                                    .format(type(left).__name__))
+            else:
+                raise Exception("Left operand of numeric operation is not a number but {}"
+                                .format(type(left).__name__))
 
         if not isinstance(right, Decimal):
-            raise Exception("Right operand of numeric operation is not a number but {}".format(type(right).__name__))
+            if isinstance(right, str):
+                try:
+                    right = Decimal(right)
+                except Exception:
+                    raise Exception("Right operand of numeric operation is not a number but {}"
+                                    .format(type(right).__name__))
+            else:
+                raise Exception("Right operand of numeric operation is not a number but {}"
+                                .format(type(right).__name__))
+        return left, right
 
 
 class Addition(Operation):
@@ -16,7 +33,7 @@ class Addition(Operation):
         return "Addition"
 
     def __call__(self, left, right):
-        self.verify(left, right)
+        (left, right) = self.verify(left, right)
         return left + right
 
     symbol = "+"
@@ -29,7 +46,7 @@ class Subtraction(Operation):
         return "Subtraction"
 
     def __call__(self, left, right):
-        self.verify(left, right)
+        (left, right) = self.verify(left, right)
         return left - right
 
     symbol = "-"
@@ -42,7 +59,7 @@ class Multiplication(Operation):
         return "Multiplication"
 
     def __call__(self, left, right):
-        self.verify(left, right)
+        (left, right) = self.verify(left, right)
         return left * right
 
     symbol = "*"
@@ -55,7 +72,7 @@ class Division(Operation):
         return "Division"
 
     def __call__(self, left, right):
-        self.verify(left, right)
+        (left, right) = self.verify(left, right)
         return left / right
 
     symbol = "/"

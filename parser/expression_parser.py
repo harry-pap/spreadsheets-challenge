@@ -4,8 +4,9 @@ from parser.node import Node, Link
 from parser.numeric_operation import Addition, Subtraction, Multiplication, Division
 from parser.raw_value_matcher import RawNumberMatcher, RawStringMatcher
 from parser.funtion import SquareFunction, SumFunction, UppercaseFunction, TextFunction, BiggerThanOrEqualToFunction, \
-    ConcatFunction, SplitFunction, SpreadFunction
-from parser.value_referrence import SpecificCellMatcher, LastComputedInColumnMatcher, LastCellInColumnMatcher
+    ConcatFunction, SplitFunction, SpreadFunction, IncrementFromFunction
+from parser.value_referrence import SpecificCellMatcher, LastComputedInColumnMatcher, LastCellInColumnMatcher, \
+    NamedCellMatcher, SpecialCopyMatcher
 from parser.cell_processor import CellStorage
 from parser.cell import Cell
 
@@ -101,14 +102,9 @@ class ExpressionParser:
                     if match is None:
                         continue
 
-                    referenced_value = reference.match(expression[i:], current_cell, cell_storage)
+                    referenced_node = reference.match(expression[i:], current_cell, cell_storage)
 
-                    node = Node(
-                        referenced_value,
-                        None,
-                        None
-                    )
-                    scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, node)
+                    scanned_subtree = self.__handle_scanned_subtree(scanned_subtree, referenced_node)
 
                     i += match.end()
                     raise MainLoopContinue
@@ -208,6 +204,7 @@ def default_expression_parser():
             ConcatFunction(),
             BiggerThanOrEqualToFunction(),
             TextFunction(),
+            IncrementFromFunction(),
         ],
         [
             RawNumberMatcher(),
@@ -217,6 +214,8 @@ def default_expression_parser():
             SpecificCellMatcher(),
             LastComputedInColumnMatcher(),
             LastCellInColumnMatcher(),
+            NamedCellMatcher(),
+            SpecialCopyMatcher(),
         ],
     )
 

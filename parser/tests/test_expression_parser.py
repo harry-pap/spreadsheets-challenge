@@ -73,6 +73,20 @@ class ExpressionParserTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_expressions_with_label_reference(self):
+        expression = "15+@foobar<2>*3"
+        cellstorage = CellStorage()
+        cellstorage.named_cells["foobar"] = Cell.from_string("B3")
+        cellstorage.cells[Cell.from_string("B5")] = Decimal(75)
+        parser = default_expression_parser()
+
+        node = parser.parse(expression, Cell.from_string("F2"), cellstorage)
+
+        actual = node.visit()
+        expected = Decimal(240)
+
+        self.assertEqual(expected, actual)
+
     @parameterized.expand([
         ["*3", 'Operator scanned without an operand first'],
         ["2(3)", "Scanned subexpression after value or expression without an operator in between"],

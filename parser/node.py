@@ -1,5 +1,6 @@
 from parser.numeric_operation import Operation
 from parser.funtion import Function
+from parser.funtion import IncrementFromFunction
 from decimal import Decimal
 
 
@@ -34,6 +35,16 @@ class Node:
             return list(filter(None, list_from_left + list_from_right))
         else:
             return self.value
+
+    def apply_special_copy(self):
+        if isinstance(self.value, IncrementFromFunction):
+            if not isinstance(self.left.value, Decimal):
+                raise Exception("incFrom should have a static number as seed")
+            self.left.value = self.left.value + 1
+        if self.left is not None:
+            self.left.apply_special_copy()
+        if self.right is not None:
+            self.right.apply_special_copy()
 
     @staticmethod
     def __list_from_link(result_from_subtree):
