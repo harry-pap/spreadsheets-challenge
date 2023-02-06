@@ -3,6 +3,7 @@ import copy
 from parser.cell import Cell
 from parser.cell_processor import CellStorage
 from parser.node import Node
+from parser.cell_referrence import LastComputedCellInColumnReferencingNode, LastCellInColumnReferencingNode
 
 
 class CellMatcher:
@@ -32,10 +33,8 @@ class LastComputedInColumnMatcher(CellMatcher):
         column_name = expression[0]
         column_id = Cell.int_identifier_from_column_name(column_name)
 
-        cell = cell_storage.last_added[column_id]
-
-        return cell if isinstance(cell, Node) else Node(
-            cell,
+        return Node(
+            LastComputedCellInColumnReferencingNode(column_id),
             None,
             None
         )
@@ -47,11 +46,8 @@ class LastCellInColumnMatcher(CellMatcher):
     def match(self, expression: str, current_cell: Cell, cell_storage: CellStorage):
         column_name = expression[0]
 
-        target_cell = Cell.from_string("{}{}".format(column_name, current_cell.row - 1))
-        cell = cell_storage.cells[target_cell]
-
-        return cell if isinstance(cell, Node) else Node(
-            cell,
+        return Node(
+            LastCellInColumnReferencingNode(column_name),
             None,
             None
         )

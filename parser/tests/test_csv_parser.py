@@ -79,11 +79,11 @@ class CSVParserTest(unittest.TestCase):
         expected_parser_output = """date|transaction_id|tokens|token_prices|total_cost
 2022-02-20|t_1|btc,eth,dai|38341.88,2643.77,1.0003|40986.6503
 2022-02-21|t_2|bch,eth,dai|304.38,2621.15,1.0001|43913.1804
-2022-02-22|t_3|sol,eth,dai|85,2604.17,0.9997|<THIS IS BUGGY>
+2022-02-22|t_3|sol,eth,dai|85,2604.17,0.9997|46839.7105
 fee|cost_threshold|||
 0.09|10000|||
 adjusted_cost||||
-47865.366636||||
+51055.284445||||
 cost_too_high||||
 True||||
 """

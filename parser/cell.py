@@ -44,6 +44,7 @@ class Cell:
 
         return ord(string[0]) - Cell.INDEX_OF_A_CAPITAL + 1
 
+
 if __name__ == '__main__':
     cell = Cell.from_string("C33")
     print(cell)

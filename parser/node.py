@@ -1,7 +1,10 @@
+from decimal import Decimal
 from parser.numeric_operation import Operation
 from parser.funtion import Function
 from parser.funtion import IncrementFromFunction
-from decimal import Decimal
+from parser.cell import Cell
+from parser.cell_processor import CellStorage
+from parser.cell_referrence import CellReferencingNode
 
 
 class Link:
@@ -20,14 +23,16 @@ class Node:
             ret += child.__str__(level + 1)
         return ret
 
-    def visit(self, sum=Decimal(0)):
-        from_left = None if self.left is None else self.left.visit(sum)
-        from_right = None if self.right is None else self.right.visit(sum)
+    def visit(self, current_cell: Cell, cell_storage: CellStorage, sum=Decimal(0)):
+        from_left = None if self.left is None else self.left.visit(current_cell, cell_storage, sum)
+        from_right = None if self.right is None else self.right.visit(current_cell, cell_storage, sum)
 
         if isinstance(self.value, Operation):
             return self.value(from_left, from_right)
         elif isinstance(self.value, Function):
             return self.value(from_left)
+        elif isinstance(self.value, CellReferencingNode):
+            return self.value.instantiate(current_cell, cell_storage)
         elif isinstance(self.value, Link):
             list_from_left = self.__list_from_link(from_left)
             list_from_right = self.__list_from_link(from_right)

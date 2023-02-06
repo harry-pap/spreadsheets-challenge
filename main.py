@@ -5,7 +5,8 @@ from parser.node import Node
 from parser.expression_parser import default_expression_parser
 from parser.cell_processor import CellProcessor
 from parser.value_referrence import SpecificCellMatcher
-
+from parser.cell import Cell
+from parser.cell_processor import CellStorage
 
 def main():
     parser = CSVParser(CellProcessor(default_expression_parser()))
@@ -23,7 +24,7 @@ def create_operetion_node():
     )
 
     print("Foobar:\n{}".format(the_node))
-    result = the_node.visit()
+    result = the_node.visit(Cell.from_string("A1"), CellStorage())
     print("Result: {}".format(result))
 
 
