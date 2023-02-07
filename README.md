@@ -17,7 +17,11 @@ Create a virtual evn with:
 
 Activate the virtual environment:
 
-`source env/bin/activate`
+`source <virtual-environment-name>/bin/activate`
+
+Install the requirements:
+
+`pip install -r requirements.txt`
 
 Run the tests:
 
