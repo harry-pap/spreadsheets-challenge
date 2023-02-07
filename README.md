@@ -36,15 +36,18 @@ emulating the linked list of function calls.
 ### Arithmetic operators
 When arithmetic operators are involved, two variables(pointers) are used to track root(lowest priority operation) and 
 last added(which may point to root, or to the right child of root). A weight property is used to determine operator 
-priority. The following logic is used to re-order the tree, where operator is the current scanned operator, subtree is 
-the currently scanned subtree(may be a value or an expression within parentheses, which is computed recursively), 
+priority. The following logic is used to re-order the tree, where `operator` is the current scanned operator, `subtree`
+is the currently scanned subtree(can be a value or an expression within parentheses, which is computed recursively), 
 when parsing `1+2`, `+` is `operator` and `1` is `subtree` :
 
 * if `last_added is none`(tree initialisation) 
+
  -> operator.left = subtree 
+
  -> root, last_added = operator
 
 * else if `operator.weight > last_added.weight` (scanned operator should be executed before last added, so it ends up a level below last_added)
+
 -> operator.left = subtree
 
 -> last_added.right = operator
@@ -52,7 +55,7 @@ when parsing `1+2`, `+` is `operator` and `1` is `subtree` :
 -> last_added = operator
 
 * else if `operator.weight > root.weight` (scanned operator has the same weight or lower as last_added, but has priority
-over root, so should be executed after last_added but before root, for example: 1+2*3*4, the second multiplication(*4)
+over root, so should be executed after last_added but before root, for example: 1+2\*3\*4, the second multiplication(*4)
 should be executed after the first multiplication but before the addition)
 
 -> last_added.right = subtree
