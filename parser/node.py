@@ -1,10 +1,12 @@
 from decimal import Decimal
-from parser.numeric_operation import Operation
-from parser.funtion import Function
-from parser.funtion import IncrementFromFunction
+from io import StringIO
+
 from parser.cell import Cell
 from parser.cell_processor import CellStorage
 from parser.cell_referrence import CellReferencingNode
+from parser.funtion import Function
+from parser.funtion import IncrementFromFunction
+from parser.numeric_operation import Operation
 
 
 class Link:
@@ -17,11 +19,22 @@ class Node:
         self.left = left
         self.right = right
 
-    def __str__(self, level=0):
-        ret = "    " * level + "└──" + str(self.value) + "\n"
-        for child in filter(None, [self.left, self.right]):
-            ret += child.__str__(level + 1)
-        return ret
+    def __str__(self):
+        with StringIO() as buffer:
+            self.__print_tree(buffer, "", "")
+            return buffer.getvalue()
+
+    def __print_tree(self, buffer, prefix, children_prefix):
+        buffer.write(prefix)
+        buffer.write(str(self.value))
+        buffer.write('\n')
+
+        existing_children = list(filter(None, [self.left, self.right]))
+        for index, value in enumerate(existing_children):
+            if len(existing_children) > index + 1:
+                value.__print_tree(buffer, "{}├── ".format(children_prefix), "{}│   ".format(children_prefix))
+            else:
+                value.__print_tree(buffer, "{}└── ".format(children_prefix), "{}    ".format(children_prefix))
 
     def visit(self, current_cell: Cell, cell_storage: CellStorage, sum=Decimal(0)):
         from_left = None if self.left is None else self.left.visit(current_cell, cell_storage, sum)

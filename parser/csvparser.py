@@ -1,9 +1,9 @@
-import sys
 import csv
+import sys
 
 from parser.cell import Cell
-from parser.expression_parser import default_expression_parser
 from parser.cell_processor import CellProcessor
+from parser.expression_parser import default_expression_parser
 
 
 class CSVParser:

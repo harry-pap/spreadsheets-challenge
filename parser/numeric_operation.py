@@ -2,7 +2,6 @@ from decimal import Decimal
 
 
 class Operation:
-    # TODO implement implicit casts from string to decimal when needed
     def verify(self, left, right):
         if not isinstance(left, Decimal):
             if isinstance(left, str):
