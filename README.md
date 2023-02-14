@@ -3,8 +3,7 @@ Implementation of the spreadsheets challenge
 ## Stack
 
 The solution was implemented in python. While I have worked with python before, it was in the context
-of scripting its use was very limited(many years ago as well), this assignment is by far the most complicated task I have ever 
-task I have ever implemented in this language. 
+of scripting its use was very limited(many years ago as well), this assignment is by far the most complicated task I have ever implemented in this language. 
 
 ## Running
 You need the latest python 3.9.6+(earlier versions of python 3 might work as well) in your path as well as pip.
@@ -35,7 +34,7 @@ To run the tool, provide the path to the input file as the first argument, and t
 ## Implementation
 Each expression is parsed into a binary syntax tree, which is evaluated from the left bottom up(Post-Order traversal). 
 If no numeric operators are in place then each function is added as the left child of the enclosing function, effectively
-emulating the linked list of function calls. 
+emulating the stack of function calls. 
 
 ### Arithmetic operators
 When arithmetic operators are involved, two variables(pointers) are used to track root(lowest priority operation) and 
