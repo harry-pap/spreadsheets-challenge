@@ -115,6 +115,3 @@ are gathered in a single list and submitted to the function
 For relative operators link `A^`, a special `CellReferencingNode` is added in the tree. When the tree is traversed the
 value of the node is instantiated and computed. 
 
-
-
-Looking forward to your feedback :) 
