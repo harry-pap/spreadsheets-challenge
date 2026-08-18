@@ -1,4 +1,9 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/.idea/workspace.xml
+/.idea
+
+# Python / uv
+.venv/
+__pycache__/
+.coverage

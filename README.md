@@ -32,29 +32,34 @@ string concatenations and other useful utility functions.
 
 
 ## Running
-You need the latest python 3.9.6+(earlier versions of python 3 might work as well) in your path as well as pip.
+Dependencies are managed with [uv](https://docs.astral.sh/uv/). Install it with:
 
-Install virtualenv:
-`pip install virtualenv`
+`curl -LsSf https://astral.sh/uv/install.sh | sh`
 
-Create a virtual evn with:
-`python -m venv <virtual-environment-name>` 
+(or `brew install uv`)
 
-Activate the virtual environment:
+You don't need to create a virtual environment or install python yourself, `uv` provisions both from
+`pyproject.toml`/`uv.lock` on the first command. To do it explicitly:
 
-`source <virtual-environment-name>/bin/activate`
+`uv sync`
 
-Install the requirements:
-
-`pip install -r requirements.txt`
+The project requires python 3.9+ and is tested on 3.9 and 3.12. `uv` picks the newest compatible
+interpreter it can find; to use a specific one, pass `--python`, e.g. `uv run --python 3.9 python -m unittest`.
 
 Run the tests:
 
-`python -m unittest`
+`uv run python -m unittest`
+
+Run the tests with coverage:
+
+`uv run coverage run -m unittest && uv run coverage report`
 
 To run the tool, provide the path to the input file as the first argument, and the output as the second:
 
-`python main.py /tmp/parser/transactions.csv /tmp/parser/output.csv`
+`uv run python main.py /tmp/parser/transactions.csv /tmp/parser/output.csv`
+
+To add or remove a dependency, use `uv add <package>` / `uv remove <package>` (append `--dev` for
+test-only packages) rather than editing `pyproject.toml` by hand, so `uv.lock` stays in sync.
 
 
 ## Implementation
